@@ -8,8 +8,9 @@ use_git_config(
   user.email = "ibdjacobsen@gmail.com"
 )
 
-usethis::create_github_token()
-gitcreds::gitcreds_set()
+# see tokens https://github.com/settings/tokens
+# usethis::create_github_token()
+# gitcreds::gitcreds_set()
 
 git_vaccinate() 
 
@@ -18,3 +19,4 @@ usethis::use_git()
 use_github()
 
 git_default_branch_rename()
+
