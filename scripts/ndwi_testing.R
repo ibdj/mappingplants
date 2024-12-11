@@ -25,3 +25,36 @@ best_model <- lm(ndwi_sentinel ~ poly(soil_mean, degree = 2), data = ndwi)
 
 par(mfrow = c(2,2))
 plot(best_model)
+
+#### plotting with the best fitting model ####
+r_squared_poly2 <- summary(poly_model_2)$r.squared
+
+# Create the plot
+ggplot(ndwi, aes(x = soil_mean, y = ndwi_sentinel)) +
+  geom_point(color = "blue") + # Scatter points
+  stat_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red") + # Polynomial fit
+  labs(
+    title = "Polynomial Fit with R-squared",
+    x = "Soil Mean",
+    y = "NDWI Sentinel"
+  ) +
+  annotate("text", x = max(ndwi$soil_mean), y = max(ndwi$ndwi_sentinel), 
+           label = paste0("R² = ", round(r_squared_poly2, 2)), hjust = 1, size = 5) +
+  theme_minimal()
+
+# plotting with linear regression
+
+r_squared_linear <- summary(linear_model)$r.squared
+
+# Create the plot
+ggplot(ndwi, aes(x = soil_mean, y = ndwi_sentinel)) +
+  geom_point(color = "blue") + # Scatter points
+  stat_smooth(method = "lm", se = FALSE, color = "red") + # Polynomial fit
+  labs(
+    title = "Linear fit",
+    x = "Soil Mean",
+    y = "NDWI Sentinel"
+  ) +
+  annotate("text", x = max(ndwi$soil_mean), y = max(ndwi$ndwi_sentinel), 
+           label = paste0("R² = ", round(r_squared_linear, 2)), hjust = 1, size = 5) +
+  theme_minimal()
