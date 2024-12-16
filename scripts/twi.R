@@ -1,4 +1,12 @@
 install.packages(c("pacman"))
-pacman::p_load(raster,dynatopmodel)
+pacman::p_load(raster,dynatop)
 
-dtm <- raster("path/to/your/dtm.tif")
+dtm <- raster("data/Kobbefjord_2015_DTM_50cm.tif")
+
+slope <- terrain(dtm, opt = "slope", unit = "radians")
+flow_dir <- terrain(dtm, opt = "flowdir")
+flow_acc <- raster::area(flow_acc)
+
+twi <- log((flow_acc + 1) / (tan(slope) + 0.01))
+
+plot(twi)
