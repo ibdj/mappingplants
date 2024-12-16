@@ -82,7 +82,7 @@ ggplot(result, aes(x = soil_mean, y = ndwi)) +
   stat_smooth(method = "lm", formula = y ~ poly(x, 2), se = FALSE, color = "red") + # Polynomial fit
   stat_smooth(method = "lm", se = FALSE, color = "red") + # linear fit
   labs(
-    title = "Polynomial and linear fit with R-squared",
+    title = "ndwi: Polynomial and linear fit with R-squared",
     x = "Mean soil moisture measured (%)",
     y = "NDWI Sentinel July 2024"
   ) +
@@ -119,7 +119,7 @@ ggplot(result, aes(x = soil_mean, y = ndmi)) +
   labs(
     title = "ndmi: Polynomial and linear fit with R-squared",
     x = "Mean soil moisture measured (%)",
-    y = "NDWI Sentinel July 2024"
+    y = "ndmi Sentinel July 2024"
   ) +
   annotate("text", x = max(result$soil_mean), y = max(result$ndwi_sentinel), 
            label = paste0("Poly 2, R² = ", round(r_squared_poly2, 2)), hjust = 1, size = 5) +
