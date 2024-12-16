@@ -6,3 +6,6 @@
 .httr-oauth
 .DS_Store
 .quarto
+
+#data (excludes everything in the folder data)
+data/*
