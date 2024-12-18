@@ -98,8 +98,6 @@ ggplot(result, aes(x = soil_mean, y = ndwi)) +
   theme_minimal()
 
 
-
-
 #### correlation for ndmi ####
 
 linear_model <- lm(ndmi ~ soil_mean , data = result)
