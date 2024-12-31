@@ -2,6 +2,7 @@
 
 pacman::p_load(googlesheets4,tidyverse,janitor,ggplot2,ggpubr)
 
+# MAKE EDITS TO DOWN LOADED RAW DATA FROM SURVE123
 plant_traits <- read_sheet("https://docs.google.com/spreadsheets/d/1gAAk09YgYKcUidop3xwplKaXW3rQoOgUoF4EtZganAA/edit?gid=407247046#gid=407247046", sheet = 'clean_data', skip = 0)
 
 column_list <- colnames(plant_traits)

@@ -15,6 +15,7 @@ points <- st_read("/Users/ibdj/Library/CloudStorage/OneDrive-Aarhusuniversitet/M
 # Read rasters
 raster1 <- rast("data/ndmi_Sentinel2_20230724.tif")
 raster2 <- rast("data/ndwi_Sentinel1_2024.tif")
+twi <- rast("data/ndwi_Sentinel1_2024.tif")
 twi_spatraster <- rast(twi)
 
 # Plot raster1 to check it
