@@ -120,7 +120,7 @@ generate_dataframe <- function(number) {
   height_col <- sym(paste0("taxon_", number, "_h"))
   bb_col <- sym(paste0("taxon_", number, "_bb"))
   
-  df_raw %>%
+  df_raw |> 
     select(1:35, !!taxon_col, !!height_col, !!bb_col) %>%
     mutate(rowid = row_number(),
            position = paste0("taxon_", number)) %>%

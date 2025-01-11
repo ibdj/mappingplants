@@ -1,4 +1,3 @@
-
 install.packages("pacman")
 pacman::p_load(usethis, tidyverse) 
 
@@ -19,4 +18,5 @@ usethis::use_git()
 use_github()
 
 git_default_branch_rename()
+
 
