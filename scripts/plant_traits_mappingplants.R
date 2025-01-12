@@ -142,8 +142,39 @@ organised$soil_moisture_s <- organised$soil_moisture_s/10
 organised$soil_moisture_e <- organised$soil_moisture_e/10
 organised$soil_moisture_n <- organised$soil_moisture_n/10
 
-organised$soil_moisture <- base::mean(organised$soil_moisture_n,organised$soil_moisture_w,organised$soil_moisture_e,organised$soil_moisture_s)
-organised$mean_soil_moisture <- round(rowMeans(organised[, c("soil_moisture_n", "soil_moisture_e", "soil_moisture_s", "soil_moisture_w")]),2)
+organised$mean_soil_moisture <- round(rowMeans(organised[, c("soil_moisture_n", "soil_moisture_e", "soil_moisture_s", "soil_moisture_w")], na.rm = TRUE),2)
+
+organised[organised$mean_soil_moisture == NA]
+organised[is.na(organised$mean_soil_moisture), ]
+
+nas_moisture <- organised[is.na(organised$mean_soil_moisture), c("soil_moisture_w", "soil_moisture_n", "soil_moisture_s", "soil_moisture_e")]
+nas_moisture
+
+organised$soil_temp_n <- organised$soil_temp_n/10
+organised$soil_temp_e <- organised$soil_temp_e/10
+organised$soil_temp_s <- organised$soil_temp_s/10
+organised$soil_temp_w <- organised$soil_temp_w/10
+
+organised$mean_soil_temp <- round(rowMeans(organised[, c("soil_temp_n", "soil_temp_e", "soil_temp_s", "soil_temp_w")], na.rm = TRUE),2)
+
+nas_temp <- organised[is.na(organised$mean_soil_temp), c("soil_temp_n", "soil_temp_e", "soil_temp_s", "soil_temp_w")]
+nas_temp
+
+df_raw <- organised
+
+generate_dataframe <- function(number) {
+  taxon_col <- sym(paste0("taxon_", number))
+  height_col <- sym(paste0("taxon_", number, "_height"))
+  bb_col <- sym(paste0("taxon_", number, "_braun_blanquet"))
+  
+  df_raw |> 
+    select(1:35, !!taxon_col, !!height_col, !!bb_col) %>%
+    mutate(rowid = row_number(),
+           position = paste0("taxon_", number)) %>%
+    rename(taxon = !!taxon_col,
+           height = !!height_col,
+           bb = !!bb_col)
+}
 
 # plant_traits_clean <- plant_traits |> 
 #   select(
