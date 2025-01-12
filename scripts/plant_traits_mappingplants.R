@@ -131,7 +131,7 @@ organised <- plant_traits |>
     y
   )
 
-organised[organised == "-9999"] <- NA
+#organised[organised == "-9999"] <- NA
 
 head(organised)
 
@@ -144,11 +144,13 @@ organised$soil_moisture_n <- organised$soil_moisture_n/10
 
 organised$mean_soil_moisture <- round(rowMeans(organised[, c("soil_moisture_n", "soil_moisture_e", "soil_moisture_s", "soil_moisture_w")], na.rm = TRUE),2)
 
-organised[organised$mean_soil_moisture == NA]
+#organised[organised$mean_soil_moisture == NA]
 organised[is.na(organised$mean_soil_moisture), ]
 
 nas_moisture <- organised[is.na(organised$mean_soil_moisture), c("soil_moisture_w", "soil_moisture_n", "soil_moisture_s", "soil_moisture_e")]
 nas_moisture
+
+#### mean soil temp ####
 
 organised$soil_temp_n <- organised$soil_temp_n/10
 organised$soil_temp_e <- organised$soil_temp_e/10
@@ -160,7 +162,113 @@ organised$mean_soil_temp <- round(rowMeans(organised[, c("soil_temp_n", "soil_te
 nas_temp <- organised[is.na(organised$mean_soil_temp), c("soil_temp_n", "soil_temp_e", "soil_temp_s", "soil_temp_w")]
 nas_temp
 
-df_raw <- organised
+#### mean veg height ####
+
+organised$mean_veg_height <- round(rowMeans(organised[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
+
+
+
+
+column_list <- colnames(organised)
+
+## getting all the colomns##
+column_string <- paste(column_list, collapse = ",\n")
+cat(column_string)
+
+organised2 <- organised |> 
+  select(
+    date,
+    plot_name,
+    start_time,
+    end_time,
+    #vegetation_height_n,
+    #vegetation_height_e,
+    #vegetation_height_s,
+    #vegetation_height_w,
+    #soil_moisture_n,
+    #soil_moisture_e,
+    #soil_moisture_s,
+    #soil_moisture_w,
+    #soil_temp_e,
+    #soil_temp_n,
+    #soil_temp_s,
+    #soil_temp_w,
+    topographic_complexity_cm,
+    bryophyte_braun_blanquet_49,
+    lichen_braun_blanquet,
+    other_notes,
+    vegetation_type,
+    bare_ground_braun_blanquet,
+    other_vegetation_type,
+    tms,
+    x,
+    y,
+    mean_soil_moisture,
+    mean_soil_temp,
+    mean_veg_height,
+    taxon_1,
+    taxon_1_height,
+    taxon_1_braun_blanquet,
+    taxon_2,
+    taxon_2_height,
+    taxon_2_braun_blanquet,
+    taxon_3,
+    taxon_3_height,
+    taxon_3_braun_blanquet,
+    taxon_4,
+    taxon_4_height,
+    taxon_4_braun_blanquet,
+    taxon_5,
+    taxon_5_height,
+    taxon_5_braun_blanquet,
+    taxon_6,
+    taxon_6_height,
+    taxon_6_braun_blanquet,
+    taxon_7,
+    taxon_7_height,
+    taxon_7_braun_blanquet,
+    taxon_8,
+    taxon_8_height,
+    taxon_8_braun_blanquet,
+    taxon_9,
+    taxon_9_height,
+    taxon_9_braun_blanquet,
+    taxon_10,
+    taxon_10_height,
+    taxon_10_braun_blanquet,
+    taxon_11,
+    taxon_11_height,
+    taxon_11_braun_blanquet,
+    taxon_12,
+    taxon_12_height,
+    taxon_12_braun_blanquet,
+    taxon_13,
+    taxon_13_height,
+    taxon_13_braun_blanquet,
+    taxon_14,
+    taxon_14_height,
+    taxon_14_braun_blanquet,
+    taxon_15,
+    taxon_15_height,
+    taxon_15_braun_blanquet,
+    taxon_16,
+    taxon_16_height,
+    taxon_16_braun_blanquet,
+    taxon_17,
+    taxon_17_height,
+    taxon_17_braun_blanquet,
+    taxon_18,
+    taxon_18_height,
+    taxon_18_braun_blanquet,
+    taxon_19,
+    taxon_19_height,
+    taxon_19_braun_blanquet,
+    taxon_20,
+    taxon_20_height,
+    taxon_20_braun_blanquet
+  )
+
+df_raw <- organised2
 
 generate_dataframe <- function(number) {
   taxon_col <- sym(paste0("taxon_", number))
@@ -168,7 +276,7 @@ generate_dataframe <- function(number) {
   bb_col <- sym(paste0("taxon_", number, "_braun_blanquet"))
   
   df_raw |> 
-    select(1:35, !!taxon_col, !!height_col, !!bb_col) %>%
+    select(1:17, !!taxon_col, !!height_col, !!bb_col) %>%
     mutate(rowid = row_number(),
            position = paste0("taxon_", number)) %>%
     rename(taxon = !!taxon_col,
@@ -176,6 +284,96 @@ generate_dataframe <- function(number) {
            bb = !!bb_col)
 }
 
+taxon_list <- lapply(1:20, generate_dataframe)
+
+pivot <- bind_rows(taxon_list) |>  
+  #mutate(veg_mean_height = rowMeans(select(.,veg_height_n,veg_height_s,veg_height_e,veg_height_w))) |> 
+  filter(!is.na(taxon))
+
+pivot$bb <- as.factor(pivot$bb)
+pivot$bryophyte_braun_blanquet_49 <- as.character(pivot$bryophyte_braun_blanquet_49)
+pivot$bryophyte_braun_blanquet_49 <- as.factor(pivot$bryophyte_braun_blanquet_49)
+pivot$bare_ground_braun_blanquet <- as.character(pivot$bare_ground_braun_blanquet)
+pivot$bare_ground_braun_blanquet <- as.factor(pivot$bare_ground_braun_blanquet)
+pivot$other_notes <- as.character(pivot$other_notes)
+pivot$lichen_braun_blanquet <- as.character(pivot$lichen_braun_blanquet)
+pivot$lichen_braun_blanquet <- as.factor(pivot$lichen_braun_blanquet)
+
+bb_df <- as.data.frame(unique(pivot$bb))
+
+levels(pivot$bb)
+
+levels(pivot$bb) <- list("0.5" = "+ (<5 %; few individuals)", 
+                         "2.5" = "1 (<5 %; numerous individuals)", 
+                         "12.5" = "2 (5-25 %)",
+                         "37.5" = "3 (25-50 %)",
+                         "62.5" = "4 (50-75 %)",
+                         "87.5" = "5 (75-100 %)",
+                         "0.01" = "i (Species represented by a sin",
+                         "0.1" = "r (<5; less than 1% plot cover,") 
+
+pivot$bb_num <- as.double(as.character(pivot$bb))
+
+pivot$bb_numeric <- as.numeric(as.character(pivot$bb))
+
+column_list <- colnames(bb)
+
+## getting all the colomns##
+column_string <- paste(column_list, collapse = ",\n")
+bb <- cat(column_string)
+
+
+final <- pivot |> 
+  select(
+  date,
+plot_name,
+start_time,
+end_time,
+vegetation_height_n,
+vegetation_height_e,
+vegetation_height_s,
+vegetation_height_w,
+#soil_moisture_n,
+#soil_moisture_e,
+#soil_moisture_s,
+#soil_moisture_w,
+#soil_temp_e,
+#soil_temp_n,
+#soil_temp_s,
+#soil_temp_w,
+topographic_complexity_cm,
+bryophyte_braun_blanquet_49,
+lichen_braun_blanquet,
+other_notes,
+taxon,
+height,
+bb,
+#taxon_2,
+#taxon_2_height,
+#taxon_2_braun_blanquet,
+#taxon_3,
+#taxon_3_height,
+#taxon_3_braun_blanquet,
+#taxon_4,
+#taxon_4_height,
+#taxon_4_braun_blanquet,
+#taxon_5,
+#taxon_5_height,
+#taxon_5_braun_blanquet,
+rowid,
+position,
+#taxon_1,
+#taxon_1_height,
+#taxon_1_braun_blanquet
+)
+
+final$bb <- as.factor(final$bb)
+final$taxon <- as.factor(final$taxon)
+final$bryophyte_braun_blanquet_49 <- as.factor(final$bryophyte_braun_blanquet_49)
+
+final$mean_veg_height <- round(rowMeans(final[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
+
+head(final)
 # plant_traits_clean <- plant_traits |> 
 #   select(
 # #wkt_geom,
