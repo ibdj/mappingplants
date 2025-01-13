@@ -6,13 +6,16 @@ pacman::p_load(googlesheets4,tidyverse,janitor,ggplot2,ggpubr)
 plant_traits <- read_sheet("https://docs.google.com/spreadsheets/d/1gAAk09YgYKcUidop3xwplKaXW3rQoOgUoF4EtZganAA/edit?gid=407247046#gid=407247046", sheet = 'survey_0', skip = 0) |> 
   clean_names()
 
-column_list <- colnames(plant_traits)
+test <- read.delim2(file.choose(), sep = ",") |> 
+  clean_names()
+
+column_list <- colnames(test)
 
 ## getting all the colomns##
 column_string <- paste(column_list, collapse = ",\n")
 cat(column_string)
 
-organised <- plant_traits |> 
+organised <- test |> 
   select(
     #object_id,
     #global_id,
@@ -59,7 +62,7 @@ organised <- plant_traits |>
     soil_temp_w,
     topographic_complexity_cm,
     #bryophyte_braun_blanquet_48,
-    bryophyte_braun_blanquet_49,
+    bryophyte_braun_blanquet_1,
     lichen_braun_blanquet,
     other_notes,
     #other_taxon_3,
@@ -137,10 +140,10 @@ head(organised)
 
 sum(is.na(organised$soil_moisture_w))
 
-organised$soil_moisture_w <- organised$soil_moisture_w/10
-organised$soil_moisture_s <- organised$soil_moisture_s/10
-organised$soil_moisture_e <- organised$soil_moisture_e/10
-organised$soil_moisture_n <- organised$soil_moisture_n/10
+organised$soil_moisture_w <- as.numeric(organised$soil_moisture_w)/10
+organised$soil_moisture_s <- as.numeric(organised$soil_moisture_s)/10
+organised$soil_moisture_e <- as.numeric(organised$soil_moisture_e)/10
+organised$soil_moisture_n <- as.numeric(organised$soil_moisture_n)/10
 
 organised$mean_soil_moisture <- round(rowMeans(organised[, c("soil_moisture_n", "soil_moisture_e", "soil_moisture_s", "soil_moisture_w")], na.rm = TRUE),2)
 
@@ -152,10 +155,10 @@ nas_moisture
 
 #### mean soil temp ####
 
-organised$soil_temp_n <- organised$soil_temp_n/10
-organised$soil_temp_e <- organised$soil_temp_e/10
-organised$soil_temp_s <- organised$soil_temp_s/10
-organised$soil_temp_w <- organised$soil_temp_w/10
+organised$soil_temp_n <- as.numeric(organised$soil_temp_n)/10
+organised$soil_temp_e <- as.numeric(organised$soil_temp_e)/10
+organised$soil_temp_s <- as.numeric(organised$soil_temp_s)/10
+organised$soil_temp_w <- as.numeric(organised$soil_temp_w)/10
 
 organised$mean_soil_temp <- round(rowMeans(organised[, c("soil_temp_n", "soil_temp_e", "soil_temp_s", "soil_temp_w")], na.rm = TRUE),2)
 
@@ -163,6 +166,11 @@ nas_temp <- organised[is.na(organised$mean_soil_temp), c("soil_temp_n", "soil_te
 nas_temp
 
 #### mean veg height ####
+
+organised$vegetation_height_n <- as.numeric(organised$vegetation_height_n)
+organised$vegetation_height_e <- as.numeric(organised$vegetation_height_e)
+organised$vegetation_height_s <- as.numeric(organised$vegetation_height_s)
+organised$vegetation_height_w <- as.numeric(organised$vegetation_height_w)
 
 organised$mean_veg_height <- round(rowMeans(organised[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
 
@@ -194,7 +202,7 @@ organised2 <- organised |>
     #soil_temp_s,
     #soil_temp_w,
     topographic_complexity_cm,
-    bryophyte_braun_blanquet_49,
+    bryophyte_braun_blanquet_1,
     lichen_braun_blanquet,
     other_notes,
     vegetation_type,
@@ -291,8 +299,8 @@ pivot <- bind_rows(taxon_list) |>
   filter(!is.na(taxon))
 
 pivot$bb <- as.factor(pivot$bb)
-pivot$bryophyte_braun_blanquet_49 <- as.character(pivot$bryophyte_braun_blanquet_49)
-pivot$bryophyte_braun_blanquet_49 <- as.factor(pivot$bryophyte_braun_blanquet_49)
+pivot$bryophyte_braun_blanquet_1 <- as.character(pivot$bryophyte_braun_blanquet_1)
+pivot$bryophyte_braun_blanquet_1 <- as.factor(pivot$bryophyte_braun_blanquet_1)
 pivot$bare_ground_braun_blanquet <- as.character(pivot$bare_ground_braun_blanquet)
 pivot$bare_ground_braun_blanquet <- as.factor(pivot$bare_ground_braun_blanquet)
 pivot$other_notes <- as.character(pivot$other_notes)
@@ -312,11 +320,76 @@ levels(pivot$bb) <- list("0.5" = "+ (<5 %; few individuals)",
                          "0.01" = "i (Species represented by a sin",
                          "0.1" = "r (<5; less than 1% plot cover,") 
 
+pivot$bb_num <- as.character(pivot$bb)
+
+str(pivot)
+
+pivot$bb_num <- as.double(pivot$bb_num)
+
+str(pivot)
+
+stat <- pivot |> 
+  select(
+    #date,
+    plot_name,
+    taxon,
+    height,
+    bb,
+    bb_num,
+    mean_soil_moisture,
+    mean_soil_temp,
+    mean_veg_height,
+    rowid,
+    position,
+    #start_time,
+    #end_time,
+    #topographic_complexity_cm,
+    bryophyte_braun_blanquet_1,
+    lichen_braun_blanquet,
+    #other_notes,
+    #vegetation_type,
+    bare_ground_braun_blanquet,
+    other_vegetation_type
+    #tms,
+    #x,
+    #y,
+  ) |> 
+  filter(taxon != "")
+
+str(stat)
+
+scices <- pivot[pivot$taxon=="Scirpus caespitosus",]
+empnig <- pivot[pivot$taxon=="Empetrum nigrum",]
+carbig <- pivot[pivot$taxon=="Carex bigelowii",]
+desfle <- pivot[pivot$taxon=="Deschampsia flexuosa",]
+vaculi <- pivot[pivot$taxon=="Vaccinium uliginosum",]
+juntri <- pivot[pivot$taxon=="Juncus trifidus",]
+
+
+hist(juntri$mean_soil_moisture)
+
+hist(vaculi$mean_soil_moisture)
+
+hist(desfle$mean_soil_moisture)
+
+hist(empnig$mean_soil_moisture)
+plot(data = empnig, x = empnig$mean_soil_moisture, y = empnig$bb_num)
+
+hist(carbig$mean_soil_moisture)
+plot(x = carbig$mean_soil_moisture, y = carbig$bb_num)
+
+
+hist(pivot$mean_soil_moisture)
+
+taxa <- pivot |> 
+  group_by(taxon) |> 
+  count()
+
 pivot$bb_num <- as.double(as.character(pivot$bb))
 
 pivot$bb_numeric <- as.numeric(as.character(pivot$bb))
 
-column_list <- colnames(bb)
+column_list <- colnames(pivot)
 
 ## getting all the colomns##
 column_string <- paste(column_list, collapse = ",\n")
