@@ -162,7 +162,7 @@ nas_moisture <- organised[is.na(organised$mean_soil_moisture), c("soil_moisture_
 nas_moisture
 
 
-#### mean soil temp ####
+#### mean soil temp #######
 
 organised$soil_temp_n <- as.numeric(organised$soil_temp_n)/10
 organised$soil_temp_e <- as.numeric(organised$soil_temp_e)/10
@@ -174,7 +174,7 @@ organised$mean_soil_temp <- round(rowMeans(organised[, c("soil_temp_n", "soil_te
 nas_temp <- organised[is.na(organised$mean_soil_temp), c("soil_temp_n", "soil_temp_e", "soil_temp_s", "soil_temp_w")]
 nas_temp
 
-#### mean veg height ####
+#### mean veg height #####
 
 organised$vegetation_height_n <- as.numeric(organised$vegetation_height_n)
 organised$vegetation_height_e <- as.numeric(organised$vegetation_height_e)
@@ -183,13 +183,16 @@ organised$vegetation_height_w <- as.numeric(organised$vegetation_height_w)
 
 organised$mean_veg_height <- round(rowMeans(organised[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
 
+#### selection of colomns after calculation of means #####
+
+# use the function select_cols_list() to get the list of colomns
 
 organised2 <- organised |> 
   select(
     date,
     plot_name,
-    start_time,
-    end_time,
+    #start_time,
+    #end_time,
     #vegetation_height_n,
     #vegetation_height_e,
     #vegetation_height_s,
@@ -205,13 +208,13 @@ organised2 <- organised |>
     topographic_complexity_cm,
     bryophyte_braun_blanquet_1,
     lichen_braun_blanquet,
-    other_notes,
-    vegetation_type,
+    #other_notes,
+    #vegetation_type,
     bare_ground_braun_blanquet,
     other_vegetation_type,
-    tms,
-    x,
-    y,
+    #tms,
+    #x,
+    #y,
     mean_soil_moisture,
     mean_soil_temp,
     mean_veg_height,
@@ -285,7 +288,7 @@ generate_dataframe <- function(number) {
   bb_col <- sym(paste0("taxon_", number, "_braun_blanquet"))
   
   df_raw |> 
-    select(1:17, !!taxon_col, !!height_col, !!bb_col) %>%
+    select(1:10, !!taxon_col, !!height_col, !!bb_col) %>%
     mutate(rowid = row_number(),
            position = paste0("taxon_", number)) %>%
     rename(taxon = !!taxon_col,
@@ -297,7 +300,8 @@ taxon_list <- lapply(1:20, generate_dataframe)
 
 pivot <- bind_rows(taxon_list) |>  
   #mutate(veg_mean_height = rowMeans(select(.,veg_height_n,veg_height_s,veg_height_e,veg_height_w))) |> 
-  filter(!is.na(taxon))
+  filter(!is.na(taxon)) |> 
+  filter(taxon != "")
 
 pivot$bb <- as.factor(pivot$bb)
 pivot$bryophyte_braun_blanquet_1 <- as.character(pivot$bryophyte_braun_blanquet_1)
@@ -359,6 +363,10 @@ stat <- pivot |>
 
 str(stat)
 summary(stat)
+
+### saving the final data file to R data ####
+save(stat, file = "stat_mappingplants.RData")
+### ####
 
 scices <- pivot[pivot$taxon=="Scirpus caespitosus",]
 empnig <- pivot[pivot$taxon=="Empetrum nigrum",]
