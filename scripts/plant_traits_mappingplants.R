@@ -175,7 +175,9 @@ organised$vegetation_height_w <- as.numeric(organised$vegetation_height_w)
 organised$mean_veg_height <- round(rowMeans(organised[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
 
 
-
+function_name <- function(parameters){
+  function body 
+}
 
 column_list <- colnames(organised)
 
@@ -357,6 +359,7 @@ stat <- pivot |>
   filter(taxon != "")
 
 str(stat)
+summary(stat)
 
 scices <- pivot[pivot$taxon=="Scirpus caespitosus",]
 empnig <- pivot[pivot$taxon=="Empetrum nigrum",]
@@ -364,16 +367,39 @@ carbig <- pivot[pivot$taxon=="Carex bigelowii",]
 desfle <- pivot[pivot$taxon=="Deschampsia flexuosa",]
 vaculi <- pivot[pivot$taxon=="Vaccinium uliginosum",]
 juntri <- pivot[pivot$taxon=="Juncus trifidus",]
+salarc <- pivot[pivot$taxon=="Salix arctophila",]
+
+hist(salarc$mean_soil_moisture)
+regsalarc <- lm(bb_num ~ mean_soil_moisture, data = salarc)
+summary(regsalarc)
+plot(data = salarc, x = salarc$mean_soil_moisture, y = salarc$bb_num)
+abline(regsalarc)
 
 
 hist(juntri$mean_soil_moisture)
 
 hist(vaculi$mean_soil_moisture)
+regvaculi <- lm(bb_num ~ mean_soil_moisture, data = vaculi)
+summary(regvaculi)
+plot(data = vaculi, x = vaculi$mean_soil_moisture, y = vaculi$bb_num)
+abline(regvaculi)
+
+par(mfrow = c(2, 2))
+plot(regvaculi, which = 1:4)
+
+plot(residuals(regvaculi) ~ mean_soil_moisture, data = vaculi,
+     ylab = "Residuals")
+abline(h = 0)
+
+
 
 hist(desfle$mean_soil_moisture)
 
 hist(empnig$mean_soil_moisture)
+reg1 <- lm(bb_num ~ mean_soil_moisture, data = empnig)
+summary(reg1)
 plot(data = empnig, x = empnig$mean_soil_moisture, y = empnig$bb_num)
+abline(reg1)
 
 hist(carbig$mean_soil_moisture)
 plot(x = carbig$mean_soil_moisture, y = carbig$bb_num)
@@ -385,15 +411,33 @@ taxa <- pivot |>
   group_by(taxon) |> 
   count()
 
+mean(0.0:0.02)
+mean(0.02:0.04)
+mean(0.04,0.2)
+
 pivot$bb_num <- as.double(as.character(pivot$bb))
 
 pivot$bb_numeric <- as.numeric(as.character(pivot$bb))
 
-column_list <- colnames(pivot)
+
 
 ## getting all the colomns##
-column_string <- paste(column_list, collapse = ",\n")
-bb <- cat(column_string)
+
+function_name <- function(parameters){
+  function body 
+}
+
+#### MAKING A FUNCTION TO EXSTRAT A LIST OF COLOMNS FOR SELECT ################################################
+
+select_cols_list <- function(df) {
+  column_list <- colnames(df)
+  column_string <- paste(column_list, collapse = ",\n")
+  cat(column_string, "\n")
+  invisible(column_string)
+}
+
+select_cols_list(pivot)
+#### NEXT SECTION ################################################
 
 
 final <- pivot |> 
