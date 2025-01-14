@@ -2,18 +2,27 @@
 
 pacman::p_load(googlesheets4,tidyverse,janitor,ggplot2,ggpubr)
 
-# MAKE EDITS TO DOWN LOADED RAW DATA FROM SURVE123
-plant_traits <- read_sheet("https://docs.google.com/spreadsheets/d/1gAAk09YgYKcUidop3xwplKaXW3rQoOgUoF4EtZganAA/edit?gid=407247046#gid=407247046", sheet = 'survey_0', skip = 0) |> 
-  clean_names()
+#### get the data from google sheets ####
+# plant_traits <- read_sheet("https://docs.google.com/spreadsheets/d/1gAAk09YgYKcUidop3xwplKaXW3rQoOgUoF4EtZganAA/edit?gid=407247046#gid=407247046", sheet = 'survey_0', skip = 0) |> 
+#   clean_names()
 
+#### MAKING A FUNCTION TO EXSTRAT A LIST OF COLOMNS FOR SELECT ################################################
+
+select_cols_list <- function(df) {
+  column_list <- colnames(df)
+  column_string <- paste(column_list, collapse = ",\n")
+  cat(column_string, "\n")
+  invisible(column_string)
+}
+
+select_cols_list()
+
+#### MAKE EDITS TO DOWN LOADED RAW DATA FROM SURVE123 ####
 test <- read.delim2(file.choose(), sep = ",") |> 
   clean_names()
 
-column_list <- colnames(test)
 
-## getting all the colomns##
-column_string <- paste(column_list, collapse = ",\n")
-cat(column_string)
+select_cols_list(test)
 
 organised <- test |> 
   select(
@@ -134,12 +143,12 @@ organised <- test |>
     y
   )
 
-#organised[organised == "-9999"] <- NA
 
 head(organised)
 
 sum(is.na(organised$soil_moisture_w))
 
+#### calculate mean of soil moisture #####
 organised$soil_moisture_w <- as.numeric(organised$soil_moisture_w)/10
 organised$soil_moisture_s <- as.numeric(organised$soil_moisture_s)/10
 organised$soil_moisture_e <- as.numeric(organised$soil_moisture_e)/10
@@ -147,11 +156,11 @@ organised$soil_moisture_n <- as.numeric(organised$soil_moisture_n)/10
 
 organised$mean_soil_moisture <- round(rowMeans(organised[, c("soil_moisture_n", "soil_moisture_e", "soil_moisture_s", "soil_moisture_w")], na.rm = TRUE),2)
 
-#organised[organised$mean_soil_moisture == NA]
 organised[is.na(organised$mean_soil_moisture), ]
 
 nas_moisture <- organised[is.na(organised$mean_soil_moisture), c("soil_moisture_w", "soil_moisture_n", "soil_moisture_s", "soil_moisture_e")]
 nas_moisture
+
 
 #### mean soil temp ####
 
@@ -174,16 +183,6 @@ organised$vegetation_height_w <- as.numeric(organised$vegetation_height_w)
 
 organised$mean_veg_height <- round(rowMeans(organised[, c("vegetation_height_n", "vegetation_height_s", "vegetation_height_e", "vegetation_height_w")], na.rm = TRUE),2)
 
-
-function_name <- function(parameters){
-  function body 
-}
-
-column_list <- colnames(organised)
-
-## getting all the colomns##
-column_string <- paste(column_list, collapse = ",\n")
-cat(column_string)
 
 organised2 <- organised |> 
   select(
@@ -419,24 +418,6 @@ pivot$bb_num <- as.double(as.character(pivot$bb))
 
 pivot$bb_numeric <- as.numeric(as.character(pivot$bb))
 
-
-
-## getting all the colomns##
-
-function_name <- function(parameters){
-  function body 
-}
-
-#### MAKING A FUNCTION TO EXSTRAT A LIST OF COLOMNS FOR SELECT ################################################
-
-select_cols_list <- function(df) {
-  column_list <- colnames(df)
-  column_string <- paste(column_list, collapse = ",\n")
-  cat(column_string, "\n")
-  invisible(column_string)
-}
-
-select_cols_list(pivot)
 #### NEXT SECTION ################################################
 
 
