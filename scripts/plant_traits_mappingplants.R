@@ -280,6 +280,16 @@ organised2 <- organised |>
     taxon_20_braun_blanquet
   )
 
+organised2$taxon_21 <- "bryophyte"
+organised2$taxon_21_height <- NA
+organised2$taxon_21_braun_blanquet <- organised2$bryophyte_braun_blanquet_1
+organised2$taxon_22 <- "lichen"
+organised2$taxon_22_height <- NA
+organised2$taxon_22_braun_blanquet <- organised2$lichen_braun_blanquet
+organised2$taxon_23 <- "bareground"
+organised2$taxon_23_height <- NA
+organised2$taxon_23_braun_blanquet <- organised2$bare_ground_braun_blanquet
+
 df_raw <- organised2
 
 generate_dataframe <- function(number) {
@@ -296,7 +306,7 @@ generate_dataframe <- function(number) {
            bb = !!bb_col)
 }
 
-taxon_list <- lapply(1:20, generate_dataframe)
+taxon_list <- lapply(1:23, generate_dataframe)
 
 pivot <- bind_rows(taxon_list) |>  
   #mutate(veg_mean_height = rowMeans(select(.,veg_height_n,veg_height_s,veg_height_e,veg_height_w))) |> 
@@ -333,7 +343,7 @@ pivot$bb_num <- as.double(pivot$bb_num)
 
 str(pivot)
 
-stat <- pivot |> 
+stat_data_mappingplants <- pivot |> 
   select(
     #date,
     plot_name,
@@ -349,11 +359,11 @@ stat <- pivot |>
     #start_time,
     #end_time,
     #topographic_complexity_cm,
-    bryophyte_braun_blanquet_1,
-    lichen_braun_blanquet,
+    #bryophyte_braun_blanquet_1,
+    #lichen_braun_blanquet,
     #other_notes,
     #vegetation_type,
-    bare_ground_braun_blanquet,
+    #bare_ground_braun_blanquet,
     other_vegetation_type
     #tms,
     #x,
@@ -361,12 +371,14 @@ stat <- pivot |>
   ) |> 
   filter(taxon != "")
 
-str(stat)
+str(stat_data_mappingplants)
 summary(stat)
 
+
 ### saving the final data file to R data ####
-save(stat, file = "stat_mappingplants.RData")
+saveRDS(stat_data_mappingplants, file = "stat_mappingplants.rds")
 ### ####
+
 
 scices <- pivot[pivot$taxon=="Scirpus caespitosus",]
 empnig <- pivot[pivot$taxon=="Empetrum nigrum",]
@@ -656,4 +668,3 @@ check_number_of_taxa <- plant_trait_pivot |>
   count() 
 #|> 
 #  filter(nu_of_spec != n)
-  
