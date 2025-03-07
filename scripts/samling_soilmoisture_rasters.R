@@ -7,19 +7,32 @@ pacman::p_load(sf,terra, tidyverse)
 
 
 #### Read points from a GeoPackage ####
+#this packed can also be edited in QGIS. This now has twi from arctic dem
 points <- st_read("/Users/ibdj/Library/CloudStorage/OneDrive-Aarhusuniversitet/MappingPlants/02 Modelling future changes/survey123_data_32622.gpkg", layer = "survey")
 
+
+#### plotting to see how twi from arctic dem and my own soil moisture fits #####
+
+ggplot(points, aes(x = soil_mean, y = twi_drone_r))+
+  geom_point()+
+  geom_smooth(method = lm, linetype = "dotted", se = FALSE)
+
+ggplot(points, aes(x = soil_mean, y = twi_drone_r))+
+  geom_point()+
+  geom_smooth(method = lm, linetype = "dotted", se = FALSE)
 
 #### reading the raster ####
 
 # Read rasters
 raster1 <- rast("data/ndmi_Sentinel2_20230724.tif")
 raster2 <- rast("data/ndwi_Sentinel1_2024.tif")
-twi <- rast("data/ndwi_Sentinel1_2024.tif")
+ndwi <- rast("data/ndwi_Sentinel1_2024.tif")
 twi_spatraster <- rast(twi)
+twi_arcticdem_spatraster <- rast(twi_arcticdem)
 
 # Plot raster1 to check it
-plot(raster1)
+plot(twi_arcticdem_spatraster)
+points(points, col = "red", pch = 16)
 
 # Get the extents (not extend)
 ext1 <- ext(raster1)
